@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: "1"
+    customize_version: 'dfgfds'
+  labels:
+    k8s-app: tomcat-test101
+  name: tomcat-test101
+  namespace: default
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      k8s-app: tomcat-test101
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: tomcat-test101
+      name: tomcat-test101
+    spec:
+      nodeSelector:
+        kubernetes.io/os: 'linux'
+      containers:
+        - name: tomcat-test101
+          image: tomcat:latest
+          imagePullPolicy: Always
+          resources:
+            requests: 
+              cpu: '200m'
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+              cpu: 0.3
+          securityContext:
+            privileged: false
+          env:
+            - name: K8S_JAVA_OPTIONS
+              value: '-Dlogging.level.root=DEBUG' 
+              #value: "-Dlogging.level.root=$JavaOptionDloggingLevelRoot"
+          volumeMounts:
+            - name: linux-nfs-data
+              mountPath: /data
+            - name: k8s-local-java-logs
+              mountPath: /docker_logs
+      volumes:
+        - name: linux-nfs-data
+          persistentVolumeClaim:
+            claimName: nfs-pvc
+        - name: k8s-local-java-logs
+          hostPath:
+            path: /k8s_java_logs
+            type: Directory
+      #imagePullSecrets:
+      #  - name: registry-secret
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+
+#hostNetwork: true cat: /sys/fs/cgroup/memory/memory.usage_in_bytes: No such file or directory
