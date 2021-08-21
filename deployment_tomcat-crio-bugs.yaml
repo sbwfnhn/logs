@@ -45,7 +45,7 @@ spec:
               #value: "-Dlogging.level.root=$JavaOptionDloggingLevelRoot"
       #imagePullSecrets:
       #  - name: registry-secret
-      hostNetwork: false
+      hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       schedulerName: default-scheduler
