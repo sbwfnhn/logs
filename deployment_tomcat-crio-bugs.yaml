@@ -9,7 +9,7 @@ metadata:
   name: tomcat-test101
   namespace: default
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       k8s-app: tomcat-test101
@@ -28,14 +28,14 @@ spec:
         kubernetes.io/os: 'linux'
       containers:
         - name: tomcat-test101
-          image: tomcat:latest
+          image: docker.io/library/tomcat:latest
           imagePullPolicy: Always
           resources:
             requests: 
               cpu: '200m'
               memory: 512Mi
             limits:
-              memory: 1Gi
+              memory: 700Mi
               cpu: 0.3
           securityContext:
             privileged: false
@@ -43,22 +43,9 @@ spec:
             - name: K8S_JAVA_OPTIONS
               value: '-Dlogging.level.root=DEBUG' 
               #value: "-Dlogging.level.root=$JavaOptionDloggingLevelRoot"
-          volumeMounts:
-            - name: linux-nfs-data
-              mountPath: /data
-            - name: k8s-local-java-logs
-              mountPath: /docker_logs
-      volumes:
-        - name: linux-nfs-data
-          persistentVolumeClaim:
-            claimName: nfs-pvc
-        - name: k8s-local-java-logs
-          hostPath:
-            path: /k8s_java_logs
-            type: Directory
       #imagePullSecrets:
       #  - name: registry-secret
-      hostNetwork: true
+      hostNetwork: false
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       schedulerName: default-scheduler
